@@ -14,11 +14,19 @@ class Order extends Model
         'user_id',
         'order_number',
         'status',
+        'payment_type',
+        'snap_token',
+        'midtrans_transaction_id',
+        'paid_at',
         'total_amount',
         'customer_name',
         'phone',
         'shipping_address',
         'notes',
+    ];
+
+    protected $casts = [
+        'paid_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -29,5 +37,20 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function statusHistories(): HasMany
+    {
+        return $this->hasMany(OrderStatusHistory::class)->latest();
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->paid_at !== null;
     }
 }

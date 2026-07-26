@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Notifications\OrderCreated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -65,9 +66,16 @@ class CheckoutController extends Controller
 
             $cart->items()->delete();
 
+            $order->statusHistories()->create([
+                'status' => 'pending',
+                'note' => 'Order dibuat, menunggu pembayaran.',
+            ]);
+
             return $order;
         });
 
-        return redirect()->route('orders.show', $order)->with('success', 'Checkout berhasil dibuat.');
+        $order->user->notify(new OrderCreated($order));
+
+        return redirect()->route('payment.show', $order)->with('success', 'Checkout berhasil dibuat, silakan selesaikan pembayaran.');
     }
 }

@@ -8,7 +8,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CatalogController::class, 'index'])->name('catalog.index');
@@ -32,7 +35,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/pesanan', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/pesanan/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/pesanan/{order}/invoice', [InvoiceController::class, 'show'])->name('orders.invoice');
+    Route::get('/pembayaran/{order}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/pembayaran/{order}/cek-status', [PaymentController::class, 'sync'])->name('payment.sync');
+    Route::post('/spareparts/{product}/ulasan', [ReviewController::class, 'store'])->name('reviews.store');
 });
+
+Route::post('/midtrans/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');

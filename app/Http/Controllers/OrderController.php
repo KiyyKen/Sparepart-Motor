@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Services\MidtransPaymentSync;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -19,6 +20,12 @@ class OrderController extends Controller
     {
         abort_unless($order->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
 
-        return view('orders.show', ['order' => $order->load('items')]);
+        $order->load('items.product', 'statusHistories', 'reviews');
+
+        if ($order->status === 'pending') {
+            MidtransPaymentSync::refreshFromGateway($order);
+        }
+
+        return view('orders.show', ['order' => $order]);
     }
 }

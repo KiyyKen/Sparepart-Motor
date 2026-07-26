@@ -13,6 +13,8 @@ class CatalogController extends Controller
     {
         $products = Product::query()
             ->with('category')
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
             ->where('is_active', true)
             ->when($request->search, fn ($query, $search) => $query->where('name', 'like', "%{$search}%"))
             ->when($request->category, fn ($query, $category) => $query->whereHas('category', fn ($q) => $q->where('slug', $category)))
@@ -30,6 +32,9 @@ class CatalogController extends Controller
     {
         abort_unless($product->is_active, 404);
 
-        return view('catalog.show', compact('product'));
+        $product->load(['reviews' => fn ($query) => $query->with('user')->latest()]);
+        $averageRating = round($product->reviews->avg('rating') ?? 0, 1);
+
+        return view('catalog.show', compact('product', 'averageRating'));
     }
 }
