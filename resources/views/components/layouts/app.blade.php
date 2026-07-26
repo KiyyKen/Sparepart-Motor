@@ -291,11 +291,11 @@
         .part-card__cta:hover { background: var(--amber); color: var(--ink); }
 
         /* Admin shell */
-        .admin-shell { min-height: calc(100vh - 56px); }
+        .admin-shell { min-height: calc(100vh - 62px); }
 
         .sidebar {
             background: var(--ink);
-            min-height: 100%;
+            min-height: calc(100vh - 62px);
         }
 
         .sidebar__brand {
